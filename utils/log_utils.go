@@ -8,20 +8,20 @@ import (
 	"time"
 )
 
-// LogEntry represents a log entry
+// LogEntry représente une entrée de journal
 type LogEntry struct {
 	Timestamp time.Time
 	Filename  string
 	Message   string
 }
 
-// readCSVFile reads a CSV file and returns its entries
+// readCSVFile lit un fichier CSV et renvoie ses entrées
 func ReadCSVFile(filePath string) ([]LogEntry, error) {
 	var entries []LogEntry
 
 	file, err := os.Open(filePath)
 	if err != nil {
-		return nil, fmt.Errorf("failed to open file %s: %v", filePath, err)
+		return nil, fmt.Errorf("échec de l'ouverture du fichier %s : %v", filePath, err)
 	}
 	defer file.Close()
 
@@ -30,20 +30,20 @@ func ReadCSVFile(filePath string) ([]LogEntry, error) {
 	for scanner.Scan() {
 		line := scanner.Text()
 
-		// Custom logic to split line into fields
+		// Logique personnalisée pour diviser la ligne en champs
 		fields := strings.Split(line, ",")
 
-		// Ensure there are at least 3 fields (timestamp, filename, message)
+		// S'assurer qu'il y a au moins 3 champs (timestamp, filename, message)
 		if len(fields) < 3 {
-			continue // Skip lines with fewer than 3 fields
+			continue // Ignorer les lignes avec moins de 3 champs
 		}
 
-		// Join excess fields back into the message field
+		// Rejoindre les champs excédentaires dans le champ message
 		message := strings.Join(fields[2:], ",")
 
 		timestamp, err := time.Parse(time.RFC3339, fields[0])
 		if err != nil {
-			return nil, fmt.Errorf("failed to parse timestamp in CSV file %s: %v", filePath, err)
+			return nil, fmt.Errorf("échec de l'analyse du timestamp dans le fichier CSV %s : %v", filePath, err)
 		}
 
 		entry := LogEntry{
@@ -55,7 +55,7 @@ func ReadCSVFile(filePath string) ([]LogEntry, error) {
 	}
 
 	if err := scanner.Err(); err != nil {
-		return nil, fmt.Errorf("error reading CSV file %s: %v", filePath, err)
+		return nil, fmt.Errorf("erreur de lecture du fichier CSV %s : %v", filePath, err)
 	}
 
 	return entries, nil

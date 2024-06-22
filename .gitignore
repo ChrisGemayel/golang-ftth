@@ -27,3 +27,4 @@ data/*
 
 output/*
 !output/
+report.csv

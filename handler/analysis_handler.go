@@ -9,7 +9,7 @@ import (
 
 func AnalysisHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Header.Get("Accept") != "text/csv" {
-		http.Error(w, "Invalid Accept header", http.StatusNotAcceptable)
+		http.Error(w, "En-tête Accept invalide", http.StatusNotAcceptable)
 		return
 	}
 
@@ -18,35 +18,32 @@ func AnalysisHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-
-	// Create the output directory if it doesn't exist
+	// Créer le répertoire de sortie s'il n'existe pas
 	outputDir := "./output"
 	if err := os.MkdirAll(outputDir, 0755); err != nil {
-		http.Error(w, "Failed to create output directory", http.StatusInternalServerError)
+		http.Error(w, "Échec de la création du répertoire de sortie", http.StatusInternalServerError)
 		return
 	}
 
-	// Specify the output file path
+	// Spécifier le chemin du fichier de sortie
 	outputPath := filepath.Join(outputDir, "analysis_result.csv")
 
-	// Write result to the specified output file
+	// Écrire le résultat dans le fichier de sortie spécifié
 	file, err := os.Create(outputPath)
 	if err != nil {
-		http.Error(w, "Failed to create output file", http.StatusInternalServerError)
+		http.Error(w, "Échec de la création du fichier de sortie", http.StatusInternalServerError)
 		return
 	}
 	defer file.Close()
 
 	_, err = file.WriteString(result)
 	if err != nil {
-		http.Error(w, "Failed to write result to file", http.StatusInternalServerError)
+		http.Error(w, "Échec de l'écriture du résultat dans le fichier", http.StatusInternalServerError)
 		return
 	}
 
-	// Set response headers
+	// Définir les en-têtes de réponse
 	w.Header().Set("Content-Type", "text/csv")
 	w.Header().Set("Content-Disposition", "attachment; filename=analysis_result.csv")
-
-	// Serve the file content as response
-	http.ServeFile(w, r, outputPath)
+	w.Write([]byte(result))
 }
